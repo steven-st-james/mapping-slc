@@ -141,5 +141,11 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
 			}
 		};
 
+		//bind and config ckeditor in view
+		$scope.editorOptions = {
+			language: 'en',
+			uiColor: '#000000'
+		};
+
 	}
 ]);
