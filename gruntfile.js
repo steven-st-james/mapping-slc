@@ -4,6 +4,7 @@ var fs = require('fs');
 
 //require('load-grunt-tasks')(grunt); // npm install --save-dev load-grunt-tasks
 
+
 module.exports = function(grunt) {
 	// Unified Watch Object
 	var watchFiles = {
@@ -12,7 +13,8 @@ module.exports = function(grunt) {
 		clientViews: ['public/modules/**/views/**/*.html'],
 		clientJS: ['public/js/*.js', 'public/modules/**/*.js'],
 		clientCSS: ['public/modules/**/*.css'],
-		mochaTests: ['app/tests/**/*.js']
+		mochaTests: ['app/tests/**/*.js'],
+		core: ['public/core/css/']
 	};
 
 	// Project Configuration
@@ -84,10 +86,23 @@ module.exports = function(grunt) {
 			}
 		},
 		cssmin: {
-			combine: {
+			options: {
+				shorthandCompacting: false,
+				roundingPrecision: -1
+			},
+			core: {
 				files: {
-					'public/dist/application.min.css': '<%= applicationCSSFiles %>'
+					'output.css': ['core.css', 'map.css']
 				}
+			},
+			clientCSS: {
+				files: [{
+					expand: true,
+					cwd: 'public/modules/*/css',
+					src: ['*.css', '!*.min.css'],
+					dest: 'public/dist',
+					ext: '.min.css'
+				}]
 			}
 		},
 		nodemon: {
@@ -171,6 +186,8 @@ module.exports = function(grunt) {
 
 	// Load NPM tasks
 	require('load-grunt-tasks')(grunt);
+
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 
 	// Making grunt default to force in order not to break the project.
 	grunt.option('force', true);

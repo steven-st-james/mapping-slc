@@ -1,21 +1,7 @@
 'use strict';
 
-angular.module('core').controller('HomeController', ['$scope', 'AuthenticationService', 'ApiKeys', '$http', 'MarkerDataService', 'mapService', 'AdminAuthService', '$rootScope', '$location', 'formAnimationService', '$sce', '$window', '_',
-	function ($scope, AuthenticationService, ApiKeys, $http, MarkerDataService, mapService, AdminAuthService, $rootScope, $location, formAnimationService, $sce, $window, _) {
-
-		Array.prototype.objToArray = function(obj) {
-			_.toArray = function(iterable) {
-				if (!iterable)                return [];
-				if (iterable.toArray)         return iterable.toArray();
-				if (_.isArray(iterable))      return iterable;
-				if (_.isArguments(iterable))  return slice.call(iterable);
-				return _.values(iterable);
-			};
-
-			_.values = function(obj) {
-				return _.map(obj, _.identity);
-			};
-		};
+angular.module('core').controller('HomeController', ['$scope', 'AuthenticationService', 'ApiKeys', '$http', 'MarkerDataService', 'mapService', 'AdminAuthService', '$rootScope', '$location', 'formAnimationService', '$sce', '$window',
+	function ($scope, AuthenticationService, ApiKeys, $http, MarkerDataService, mapService, AdminAuthService, $rootScope, $location, formAnimationService, $sce, $window) {
 
 		$scope.authentication = AuthenticationService;
 		$scope.isAdmin = AdminAuthService;
@@ -208,7 +194,7 @@ angular.module('core').controller('HomeController', ['$scope', 'AuthenticationSe
 			})
 				.setView([40.7630772,-111.8689467], 12)
 				//allow users to share maps on social media
-				.addControl(L.mapbox.shareControl())
+				//.addControl(L.mapbox.shareControl())
 				.addControl(L.mapbox.geocoderControl('mapbox.places'));
 
 			var grayMap = L.mapbox.tileLayer('poetsrock.b06189bb'),
@@ -230,7 +216,13 @@ angular.module('core').controller('HomeController', ['$scope', 'AuthenticationSe
 			};
 
 			grayMap.addTo(map);
-			L.control.layers(layers).addTo(map);
+
+			var leafletControls = L.control.layers(layers);
+			leafletControls(setPosition('topleft'));
+			leafletControls.addTo(map);
+
+			L.control.scale().addTo(map);
+
 
 			//$scope.sidebar = setTimeout(function() {
 					var sidebar = L.control.sidebar('sidebar', {
