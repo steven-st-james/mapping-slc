@@ -12,9 +12,16 @@ angular.module('admins').config(['$stateProvider',
         //data property is inherited by child states, so you can place something like this authenticate flag in the parent.
         data: {
           authenticate: true,
+<<<<<<< HEAD
           data: {
             roles: ['admin', 'superUser']
           }
+=======
+          roles: ['admin']
+        },
+        authPermissions: {
+          roles: ['admin', 'superUser']
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
         }
       })
     //admin projects routes

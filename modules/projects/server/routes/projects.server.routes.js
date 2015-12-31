@@ -29,6 +29,10 @@ module.exports = function (app) {
 
   //app.route('/api/v1/projects').all(projectsPolicy.isAllowed)
   app.route('/api/v1/projects')
+<<<<<<< HEAD
+=======
+    //.post(projects.markerData, projects.create);
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     .post(projects.create);
 
 
@@ -36,6 +40,7 @@ module.exports = function (app) {
   //app.route('/api/v1/projects/:projectId').all(projectsPolicy.isAllowed)
   app.route('/api/v1/projects/:projectId')
     .get(projects.read)
+    //.put(projects.markerData, projects.update)
     .put(projects.update)
     .delete(projects.delete);
 

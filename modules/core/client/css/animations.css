@@ -273,10 +273,15 @@
 }
 
 .animate-small-logo {
+<<<<<<< HEAD
     background: rgba(0,0,0,0.8);
     border: 3px solid #023a31;
     border-radius: 0 0 0 15%;
     color: #fff;
+=======
+    color: #F0F8FF;
+    font-size: 2rem;
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     cursor: pointer;
     position: relative;
     text-align: center;
@@ -288,6 +293,7 @@
     left: 20px;
     margin-bottom: 25px;
     padding: 20px;
+<<<<<<< HEAD
     -webkit-transition: all 0.25s ease;
     -moz-transition: all 0.25s ease;
     -o-transition: all 0.25s ease;
@@ -295,15 +301,32 @@
 }
 
 .animate-small-logo:hover {
+=======
+    -webkit-transition: all 0.15s ease;
+    -moz-transition: all 0.15s ease;
+    -o-transition: all 0.15s ease;
+    transition: all 0.15s ease;
+}
+
+.animate-small-logo:hover {
+    color: rgb(0, 0, 0);
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     -webkit-transform: scale(1.1);
     -moz-transform: scale(1.1);
     -ms-transform: scale(1.1);
     -o-transform: scale(1.1);
     transform: scale(1.1);
+<<<<<<< HEAD
     -webkit-transition: all 0.25s ease;
     -moz-transition: all 0.25s ease;
     -o-transition: all 0.25s ease;
     transition: all 0.25s ease;
+=======
+    -webkit-transition: all 0.15s ease;
+    -moz-transition: all 0.15s ease;
+    -o-transition: all 0.15s ease;
+    transition: all 0.15s ease;
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 }
 
 span.animate-small-logo div {

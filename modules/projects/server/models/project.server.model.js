@@ -160,6 +160,7 @@ var ProjectSchema = new Schema({
     type: Boolean,
     default: 'false'
   },
+<<<<<<< HEAD
   //mainImage: {
   //  type: String,
   //  trim: true
@@ -167,6 +168,15 @@ var ProjectSchema = new Schema({
   mainImage: {
     type: Buffer
   },
+=======
+  mainImage: {
+    type: String,
+    trim: true
+  },
+  //mainImage: {
+  //  type: Buffer
+  //},
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
   mainImgThumbnail: {
     type: Buffer
   },
@@ -190,6 +200,17 @@ var ProjectSchema = new Schema({
         return url;
       }
     }
+<<<<<<< HEAD
+=======
+  },
+  markerColor: {
+    type: String,
+    default: ''
+  },
+  markerSymbol: {
+    type: String,
+    default: ''
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
   }
 });
 

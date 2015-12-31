@@ -19,8 +19,13 @@ module.exports = function (app) {
   app.route('/api/v1/users/password').post(users.changePassword);
   app.route('/api/v1/users/media/photo').post(users.changeProfilePicture);
 
+<<<<<<< HEAD
   app.route('/api/v1/s3/upload/media/photo').post(users.uploadUserProfileImage);
   app.route('/api/v1/s3/upload/project').post(users.uploadProject);
+=======
+  //app.route('/api/v1/s3/upload/media/photo').post(users.uploadUserProfileImage);
+  app.route('/api/v1/s3/upload').post(users.uploadUserProfileImage);
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
   // Finish by binding the user middleware
   app.param('userId', users.userByID);

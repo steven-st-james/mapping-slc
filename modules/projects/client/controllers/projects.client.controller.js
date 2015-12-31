@@ -55,6 +55,7 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
       }
     };
 
+<<<<<<< HEAD
       /**
        * Get Featured Array
         */
@@ -71,6 +72,8 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
               })
       };
 
+=======
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     $scope.confirmPublishModal = function () {
       $scope.animationsEnabled = true;
       $uibModal.open({
@@ -316,6 +319,7 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
           });
       }
     }();
+<<<<<<< HEAD
 
     /**
      * Favorite project function
@@ -334,6 +338,26 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
     $scope.toggleFavProject = function () {
       $scope.isFavorite = !$scope.isFavorite;
 
+=======
+
+    /**
+     * Favorite project function
+     */
+
+    //getUserFavorites.getUserFavoriteStories(userFavoriteProjects, projectId);
+    //getUserFavorites.toggleFavProject();
+
+    var getUserFavoriteStories = function (userFavoriteProjects, projectId) {
+      userFavoriteProjects.forEach(function (userFavoriteProject) {
+        if (userFavoriteProject === projectId) {
+          $scope.isFavorite = true;
+        }
+      });
+    };
+    $scope.toggleFavProject = function () {
+      $scope.isFavorite = !$scope.isFavorite;
+
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
       var updateFavoriteObj = {favorite: $scope.project.id, isFavorite: true};
       if (!$scope.isFavorite) {
         updateFavoriteObj.isFavorite = false;

@@ -11,8 +11,16 @@ var _ = require('lodash'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   config = require(path.resolve('./config/config')),
   User = mongoose.model('User'),
+<<<<<<< HEAD
   AWS = require('aws-sdk'),
   s3 = {
+=======
+  Users = require('./users.profile.server.controller.js'),
+  Project = mongoose.model('Project'),
+  AWS = require('aws-sdk'),
+  s3 = {
+    keys: require('../../../../../config/env/production.js'),
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     bucket: 'mapping-slc-file-upload',
     region: 'us-west-1',
     directory: {
@@ -26,6 +34,7 @@ var _ = require('lodash'),
   tinify = require('tinify'),
   s3Url = 'https://' + s3.bucket + '.s3-' + s3.region + '.amazonaws.com';
 
+<<<<<<< HEAD
 //console.log('path::::::CONFIG MY WIG::::: -- users controller:\n', path);
 //console.log('config::::::CONFIG MY WIG::::: --- users controller:\n', config);
 
@@ -47,6 +56,14 @@ exports.uploadUserProfileImage = function (req, res) {
 
 
 
+=======
+
+/**
+ * upload user profile image to Amazon S3
+ */
+
+exports.uploadUserProfileImage = function (req, res) {
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
   var user = req.body.user;
   var fileName = req.body.filename.replace(/\s/g, '_'); //substitute all whitespace with underscores
   var path = s3.directory.user + '/' + user._id + '/' + fileName;
@@ -73,14 +90,22 @@ exports.uploadUserProfileImage = function (req, res) {
   var base64Policy = new Buffer(stringPolicy, 'utf-8').toString('base64');
 
   // sign policy
+<<<<<<< HEAD
   var signature = crypto.createHmac('sha1', config.aws.s3Secret)
+=======
+  var signature = crypto.createHmac('sha1', config.S3_SECRET)
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     .update(new Buffer(base64Policy, 'utf-8')).digest('base64');
 
   var credentials = {
     url: s3Url,
     fields: {
       key: path,
+<<<<<<< HEAD
       AWSAccessKeyId: config.aws.s3Id,
+=======
+      AWSAccessKeyId: config.S3_ID,
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
       acl: readType,
       policy: base64Policy,
       signature: signature,
@@ -88,6 +113,7 @@ exports.uploadUserProfileImage = function (req, res) {
       success_action_status: 201
     }
   };
+<<<<<<< HEAD
 
 
   //now save url to mongoDb
@@ -99,6 +125,21 @@ exports.uploadUserProfileImage = function (req, res) {
   res.jsonp(credentials);
 
   Users.update(updateUser);
+=======
+  res.jsonp(credentials);
+
+
+
+  ////now save url to mongoDb
+
+  //user.profileImageURL = 'https://s3-' + s3.region + '.amazonaws.com/' + s3.bucket + '/' + s3.directory.user + '/' + user._id + '/' + fileName;
+  //
+  //var updateUser = {
+  //  user: user
+  //};
+
+  //Users.update(updateUser);
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
 };
 
@@ -113,8 +154,13 @@ exports.uploadUserProfileImage = function (req, res) {
 exports.getS3File = function (req, res) {
 
   var awsS3Config = {
+<<<<<<< HEAD
     accessKeyId: config.aws.s3Id,
     secretAccessKey: config.aws.s3Secret,
+=======
+    accessKeyId: config.S3_ID,
+    secretAccessKey: config.S3_SECRET,
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     region: 'us-west-1'
   };
 
@@ -136,12 +182,20 @@ exports.getS3File = function (req, res) {
   var fileType = '';
 
   //var returnedFile = require('fs').createWriteStream(userProfileImage);
+<<<<<<< HEAD
 console.log('userProfileImage:\n', userProfileImage);
+=======
+  console.log('userProfileImage:\n', userProfileImage);
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
 
   s3File.getObject(params, function(err, callback) {
     require('string_decoder');
+<<<<<<< HEAD
       if(err) {
+=======
+    if (err) {
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
         console.log('err:\n', err);
         res.send({
           message: 'ERROR, yo: ' + err
@@ -161,8 +215,11 @@ console.log('userProfileImage:\n', userProfileImage);
         //console.log(decoder.write(image));
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
         ////var buf = new Buffer('test');
         //var json = JSON.stringify(callback.Body);
         //
@@ -175,11 +232,14 @@ console.log('userProfileImage:\n', userProfileImage);
         //  //  ? new Buffer(value.data)
         //  //  : value;
         //});
+<<<<<<< HEAD
         //
         //console.log('image::::::::::::::::::::::::::::::::::::::::::::::::::\n', image);
 
 
 
+=======
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
 
         res.status(200).send({
@@ -189,14 +249,20 @@ console.log('userProfileImage:\n', userProfileImage);
           imageAsUtf8: imageAsUtf8,
           imageObjectAsString: imageToString
         });
+<<<<<<< HEAD
       }
     });
+=======
+    }
+  });
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
   //s3File.getObject(params).createReadStream().pipe(returnedFile);
 
 
 };
 
 
+<<<<<<< HEAD
 
   /**
    *
@@ -243,6 +309,8 @@ console.log('userProfileImage:\n', userProfileImage);
 
 
    */
+=======
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 /**
  * upload user profile image to Amazon S3
  */
@@ -274,7 +342,11 @@ exports.uploadUserProfileImageWithOptimization = function(req, res) {
     aws_secret_access_key: config.aws.s3Secret,
     region: s3.region,
     path: s3.bucket + '/' + path
+<<<<<<< HEAD
   };
+=======
+};
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
   //console.log('req.origFileName:\n', req.body.fileName);
 
@@ -319,6 +391,17 @@ exports.changeProfilePicture = function (req, res) {
   upload.fileFilter = profileUploadFileFilter;
 
   if (user) {
+<<<<<<< HEAD
+=======
+    //var request = require('request');
+    //request.put({url: '/api/v1/users'}, {req: user}, function (error, response, body) {
+    //  if (!error && response.statusCode == 200) {
+    //console.log('response:\n', response); // Show the HTML for the Google homepage.
+    //console.log('body:\n', body); // Show the HTML for the Google homepage.
+    //}
+    //});
+
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
     upload(req, res, function (uploadError) {
       if (uploadError) {
         return res.status(400).send({
@@ -350,6 +433,7 @@ exports.changeProfilePicture = function (req, res) {
     });
   }
 };
+<<<<<<< HEAD
 
 
 
@@ -392,3 +476,5 @@ exports.uploadProject = function (req, res) {
 
 };
 
+=======
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6

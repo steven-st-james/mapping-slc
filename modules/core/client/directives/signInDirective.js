@@ -17,7 +17,10 @@ angular.module('core').directive('signInDirective', function() {
               $scope.user.profileImage = 'modules/users/client/img/profile/uploads/uploaded-profile-image.jpg';
             }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
             /**
              *
              * turning the s3 get image function off for now ...
@@ -47,6 +50,10 @@ angular.module('core').directive('signInDirective', function() {
                   });
 
               };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
               $scope.getUploadedProfilePic();
               $scope.user.profileImage = userProfileImage;
 

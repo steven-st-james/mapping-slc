@@ -8,4 +8,23 @@ angular.module('admins').config(['$compileProvider',
     // https://docs.angularjs.org/guide/production
     $compileProvider.debugInfoEnabled(false);
   }
+<<<<<<< HEAD
 ]);
+=======
+])
+
+.run(function($rootScope, $state, Authentication) {
+  var $currentUser = Authentication.user;
+  $rootScope.$on('$stateChangeStart', function(e, to) {
+    if (!angular.isFunction(to.data)) return;
+    var result = to.data($currentUser);
+
+    if (result && result.to) {
+      e.preventDefault();
+      // Optionally set option.notify to false if you don't want
+      // to retrigger another $stateChangeStart event
+      $state.go(result.to, result.params, {notify: false});
+    }
+  });
+});
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6

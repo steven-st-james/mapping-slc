@@ -2,8 +2,11 @@
 
 // Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('core');
+<<<<<<< HEAD
 ApplicationConfiguration.registerModule('core.admin', ['core']);
 ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
+=======
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
 /**
 

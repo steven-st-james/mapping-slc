@@ -5,7 +5,11 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 
     $scope.authentication = Authentication;
     $scope.isAdmin = AdminAuthService;
+<<<<<<< HEAD
     console.log('current user:\n', $scope.authentication.user);
+=======
+    //console.log('current user:\n', $scope.authentication.user);
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
     //for overlay
     $scope.featuredProjects = {};
@@ -30,9 +34,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
     $scope.projectMarker = null;
     $scope.markerData = null;
 
-    /**
-     * test for getting and setting cookies
-     */
+
 
     /**
      *
@@ -57,6 +59,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 
 
     $scope.overlayActive = true;
+<<<<<<< HEAD
     $scope.menuOpen = false;
     //var changeMapFrom = null;
     $scope.shadeMap = false;
@@ -66,11 +69,23 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       console.log('$scope.shadeMap: ', $scope.shadeMap);
     };
 
+=======
+    $scope.sourceTo = '';
+    $scope.sourceFrom = '';
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
-    $scope.toggleOverlayFunction = function (source) {
-      if ($scope.overlayActive && source === 'overlay') {
+    $scope.menuOpen = false;
+    //var changeMapFrom = null;
+    $scope.shadeMap = false;
+
+    $scope.toggleOverlayFunction = function (sourceFrom, sourceTo) {
+      $scope.sourceFrom = sourceFrom;
+      $scope.sourceTo = sourceTo;
+      if ($scope.overlayActive && sourceFrom === 'overlay') {
+        console.log('toggle the shade! v1\n', $scope.overlayActive, '\n', sourceFrom);
         $scope.overlayActive = !$scope.overlayActive;
         $scope.shadeMap = true;
+<<<<<<< HEAD
       } else if ($scope.overlayActive && source === 'menu-closed') {
         $scope.overlayActive = false;
         $scope.menuOpen = true;
@@ -79,6 +94,19 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         $scope.menuOpen = !$scope.menuOpen;
         $scope.shadeMap = false;
       } else if (!$scope.overlayActive && source === 'home') {
+=======
+      } else if ($scope.overlayActive && sourceFrom === 'menu-closed') {
+        console.log('toggle the shade! v2\n', $scope.overlayActive, '\n', sourceFrom);
+        $scope.overlayActive = false;
+        $scope.menuOpen = true;
+        $scope.shadeMap = true;
+      } else if (!$scope.overlayActive && sourceFrom === 'menu-closed' && !$scope.menuOpen) {
+        console.log('toggle the shade! v3\n', $scope.overlayActive, '\n', sourceFrom);
+        $scope.menuOpen = !$scope.menuOpen;
+        $scope.shadeMap = false;
+      } else if (!$scope.overlayActive && sourceFrom === 'home') {
+        console.log('toggle the shade! v4\n', $scope.overlayActive, '\n', sourceFrom);
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
         $scope.menuOpen = false;
         $scope.overlayActive = true;
         $scope.shadeMap = false;
@@ -87,7 +115,9 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 
     //atrribution toggle
     $scope.attributionFull = false;
-    $scope.attributionText = '<div style="padding: 0 5px 0 2px"><a href="http://www.mapbox.com/about/maps/" target="_blank">Mapbox</a> & <a href="http://leafletjs.com/" target="_blank">Leaflet</a>, with map data by <a href="http://openstreetmap.org/copyright">OpenStreetMap©</a> | <a href="http://mapbox.com/map-feedback/" class="mapbox-improve-map">Improve this map</a></div>';
+    $scope.attributionText = '<div style="padding: 0 5px 0 2px"><a href="http://www.mapbox.com/about/maps/" target="_blank">Mapbox</a>(the world\'s best maps) & <a href="http://leafletjs.com/" target="_blank">Leaflet</a>, with map data by <a href="http://openstreetmap.org/copyright">OpenStreetMap©</a> | <a href="http://mapbox.com/map-feedback/" class="mapbox-improve-map">Improve this map</a></div>';
+
+    //overlayActive: {{$scope.overlayActive}} | sourceTo: $scope.overlayActive | sourceFrom: $scope.sourceFrom
 
     /**
      *
@@ -109,6 +139,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         mapFunction(resolved.data.MAPBOX_KEY, resolved.data.MAPBOX_SECRET);
       });
 
+<<<<<<< HEAD
 
 
 
@@ -117,18 +148,34 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
      */
     var mapFunction = function (mapboxKey, mapboxAccessToken) {
       //creates a Mapbox Map
+=======
+    /**
+    **  call map and add functionality
+    **/
+    var mapFunction = function (mapboxKey, mapboxAccessToken) {
+
+      //creates a Mapbox map
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
       L.mapbox.accessToken = mapboxAccessToken;
 
       //'info' id is part of creating tooltip with absolute position
       var info = document.getElementById('info');
 
       var map = L.mapbox.map('map', null, {
+<<<<<<< HEAD
           infoControl: false, attributionControl: false
         })
         .setView([40.7630772, -111.8689467], 12)
         .addControl(L.mapbox.geocoderControl('mapbox.places', { position: 'topright' }))
         .addControl( L.control.zoom({position: 'topright'}) );
         //.addControl(L.mapbox.Zoom({ position: 'topright' }));
+=======
+          infoControl: false, attributionControl: false,
+          legendControl: { position: 'bottomleft' }
+      })
+      .setView([40.7630772, -111.8689467], 12)
+      .addControl(L.control.zoom({position: 'topright'}));
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
       var grayMap = L.mapbox.tileLayer('poetsrock.b06189bb'),
         mainMap = L.mapbox.tileLayer('poetsrock.la999il2'),
@@ -151,6 +198,38 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       mainMap.addTo(map);
       L.control.layers(layers).addTo(map);
 
+<<<<<<< HEAD
+=======
+
+
+    //BEGIN toggle map legend
+      var legend = '<div style="padding: 0 5px 0 2px"><a href="http://www.mapbox.com/about/maps/" target="_blank">Mapbox</a>(the world\'s best maps) & <a href="http://leafletjs.com/" target="_blank">Leaflet</a>, with map data by <a href="http://openstreetmap.org/copyright">OpenStreetMap©</a> | <a href="http://mapbox.com/map-feedback/" class="mapbox-improve-map">Improve this map</a></div>';
+
+      map.getContainer().querySelector('#legend').onclick = function() {
+        if (this.className === 'active') {
+          map.legendControl.removeLegend(legend);
+          this.className = '';
+        } else {
+          map.legendControl.addLegend(legend);
+          this.className = 'active';
+        }
+        return false;
+      };
+
+      // Connect check boxes to ui functions
+      function toggle(control, element) {
+        if (element.className === 'active') {
+          control.removeFrom(map);
+          element.className = '';
+        } else {
+          control.addTo(map);
+          element.className = 'active';
+        }
+      }
+    // END toggle map legend
+
+
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
       //var markers = new L.MarkerClusterGroup();
       //markers.addLayer(new L.Marker(getRandomLatLng(map)));
       //map.addLayer(markers);
@@ -172,9 +251,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
       $scope.addProjectMarkers = function (markerData) {
         $scope.markerData = markerData;
         var index = 0;
-
-
         //loop through markers array and return values for each property
+        //todo refactor using forEach, which can iterate over objects in addition to arrays.
+        // see angular docs: https://docs.angularjs.org/api/ng/function/angular.forEach
+        //markerData.forEach();
         for (var prop in markerData) {
 
           $scope.projectMarker = L.mapbox.featureLayer({
@@ -191,9 +271,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
                 // one can customize markers by adding simplestyle properties
                 // https://www.mapbox.com/guides/an-open-platform/#simplestyle
                 'marker-size': 'large',
-                'marker-color': mapService.markerColorFn(markerData, prop),
-                //'marker-color': '#00ff00',
-                'marker-symbol': 'heart',
+                'marker-color': markerData[prop].markerColor,
+                //'marker-color': markerData.markerColor,
+                //'marker-symbol': markerData.markerSymbol,
+                'marker-symbol': 'marker-stroked',
                 projectId: markerData[prop]._id,
                 summary: markerData[prop].storySummary,
                 title: markerData[prop].title,
@@ -202,7 +283,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
                 mapImage: markerData[prop].mapImage,
                 lat: markerData[prop].lat,
                 lng: markerData[prop].lng,
-                published: markerData[prop].created,
+                published: markerData[prop].createdOn,
                 leafletId: null,
                 arrayIndexId: index
               }

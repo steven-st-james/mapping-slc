@@ -4,7 +4,11 @@
 
 angular.module('users').service('ProfileImageService', ['$http', 'Authentication',
 	function($http, Authentication) {
+<<<<<<< HEAD
 		console.log('uploader working for profilePic Service');
+=======
+		//console.log('uploader working for profilePic Service');
+>>>>>>> 2536f724a65c88f47abff3bf0831d533480a8ac6
 
 
 		//this.getUploadedProfilePic = function() {
