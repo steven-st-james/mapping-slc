@@ -1,8 +1,8 @@
 'use strict';
 
 // Projects controller
-angular.module('projects').controller('ProjectsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Projects', '$http', '$sce', 'ApiKeys', 'GeoCodeApi', '$rootScope', 'AdminAuthService', 'User', 'AdminUpdateUser', '$state', 'UtilsService', '$uibModal', '$window', '$log', 'notify', '$document', 'publishedProjectsService', 'getUserFavorites',
-  function ($scope, $stateParams, $location, Authentication, Projects, $http, $sce, ApiKeys, GeoCodeApi, $rootScope, AdminAuthService, User, AdminUpdateUser, $state, UtilsService, $uibModal, $window, $log, notify, $document, publishedProjectsService, getUserFavorites) {
+angular.module('projects').controller('ProjectsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Projects', '$http', '$sce', 'ApiKeys', 'GeoCodeApi', '$rootScope', 'AdminAuthService', 'User', 'AdminUpdateUser', '$state', 'UtilsService', '$uibModal', '$window', '$log', 'notify', '$document', 'publishedProjectsService', 'userFavoritesService', 'Upload',
+  function ($scope, $stateParams, $location, Authentication, Projects, $http, $sce, ApiKeys, GeoCodeApi, $rootScope, AdminAuthService, User, AdminUpdateUser, $state, UtilsService, $uibModal, $window, $log, notify, $document, publishedProjectsService, userFavoritesService, Upload) {
     $scope.user = Authentication.user;
     $scope.isAdmin = AdminAuthService;
     $scope.logo = '../../../modules/core/img/brand/mapping_150w.png';
@@ -18,9 +18,15 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
     $scope.override = false;
     $scope.isFavorite = false;
     $scope.trustAsHtml = $sce.trustAsHtml;
-    //$scope.publishedProjects;
-    //$scope.project = {};
+    $scope.project = {};
+    $scope.previewImages = [];
 
+    $scope.log = function(projectFiles) {
+      $scope.previewImages = projectFiles;
+      console.log('`$scope.previewImages`: ', $scope.previewImages, '\n\n');
+      // $scope.previewImages.fileSize = $scope.previewImages.map(Math.round($scope.previewImages.size)) ;
+      // console.log('`projectFiles`: ', projectFiles, '\n\n');
+    };
 
     $scope.init = function () {
       $scope.publishedProjectsFn();
@@ -29,7 +35,7 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
     $scope.initSubmissionStatus = function () {
       $scope.findOne();
     };
-
+    
     //provides logic for the css in the forms
     UtilsService.cssLayout();
 
@@ -50,11 +56,10 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
     $scope.projectStatusChanged = function () {
       if ($scope.project.status === 'published') {
         $scope.publishProject();
-        $scope.toggleEdit = false;
       } else {
         $scope.update();
-        $scope.toggleEdit = false;
       }
+      $scope.toggleEdit = false;
     };
 
     $scope.confirmPublishModal = function () {
@@ -68,12 +73,18 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
     };
 
     var publishUser = function (project) {
+      console.log('publishUser ::::  project.user._id:: ', project.user._id);
       AdminUpdateUser.get({ userId: project.user._id },
-        function (userData, getResponseHeader) {
-          userData.associatedProjects.push(project._id);
-          if (userData.roles[0] !== 'admin' || userData.roles[0] !== 'superUser') {
+        function (userData) {
+          if (userData.roles[0] !== 'admin' || userData.roles[0] !== 'superUser' && project.status === 'published') {
             userData.roles[0] = 'contributor';
           }
+
+          console.log('userData  :::: ::\n', userData);
+          console.log('publishUser ::::  project._id:: ', project._id);
+
+          userData.associatedProjects.push(project._id);
+
           userData.$update(function (userData, putResponseHeaders) {
           });
         });
@@ -90,7 +101,6 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
 
     var saveProject = null;
     $scope.updateLatLng = function (project) {
-      console.log('project ctrl', project);
       $http.get('/api/v1/keys')
         .then(function (keys, revoked) {
 
@@ -121,7 +131,8 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
 
 
     // Create new Project
-    $scope.create = function (isValid) {
+    $scope.create = function (isValid, files) {
+      console.log('$scope.create() var `files` v1:\n', files, '\n\n');
       $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'projectForm');
@@ -141,8 +152,14 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
 
       saveProject = function () {
         project.$save(function (response) {
+          console.log('response:\n', response, '\n');
+          console.log('response._id: ', response._id, '\n');
+          console.log('$scope.create() var `files` v2:\n', files, '\n\n');
+          projectUpload(response, files);
+          
           $scope.override = true;
-          $location.path('projects/' + response._id + '/status');
+          // $location.path('projects/' + response._id + '/status');
+          $location.path('blank');
           // Clear form fields
           $scope.street = '';
           $scope.city = '';
@@ -150,6 +167,7 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
           $scope.zip = '';
           $scope.story = '';
           $scope.title = '';
+          // publishUser(response);
         }, function (errorResponse) {
           $scope.error = errorResponse.data.message;
         });
@@ -157,6 +175,9 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
 
       $scope.updateLatLng(project);
       $scope.override = false;
+
+
+
     };
 
     // Remove existing Project
@@ -187,7 +208,8 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
      *
      */
     $scope.update = function (isValid, toggleId) {
-      console.log('update :::: $scope.project', $scope.project);
+
+      console.log('inside func $scope.update():::: logging var `$scope.project`', $scope.project);
       //console.log('update :::: isValid', isValid);
       //console.log('update :::: toggleId', toggleId);
       //$scope.error = null;
@@ -238,18 +260,24 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
     };
 
 
-    // Find a list of Projects
+    /**
+     * Find a list of Projects
+     */
     $scope.find = function () {
       $scope.projects = Projects.query();
     };
 
-    // Find existing Project
+    /**
+     * Find existing Project
+     */
     $scope.findOne = function () {
-
-      $scope.project = Projects.get({
-        projectId: $stateParams.projectId
-      }, function (project) {
+      // $scope.project = Projects.get({
+      Projects.get({ projectId: $stateParams.projectId },
+        function (project) {
         $scope.project = project;
+          console.log(' ::: $scope.findOne()  :::  var `$scope.project`:', $scope.project);
+          // console.log(' ::: $scope.findOne()  :::  var `$scope.project.user._id`:', $scope.project.user._id);
+          // console.log(' ::: $scope.findOne()  :::  var `$scope.user._id`        :', $scope.user._id);
         if (project.vimeoId) {
           $scope.vimeo = {
             video: $sce.trustAsResourceUrl('http://player.vimeo.com/video/' + project.vimeoId),
@@ -269,10 +297,25 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
             $scope.images.push(project.imageGallery[i]);
           }
         }
-        getUserFavoriteStories($scope.project.user.favorites, $scope.project.id);
+        getUserFavoriteStoriesFn($scope.user.favorites, $scope.project.id);
       });
 
     };
+
+
+    // /**
+    //  * Find existing User
+    //  *
+    //  * @param userIdToEdit {string} [optional] - if param exists, then function will use this as the userId for request
+    //  */
+    // $scope.adminFindOneUser = function(userIdToEdit) {
+    //   console.log(':::: userIdToEdit :::: ', userIdToEdit);
+    //   $scope.userToEdit = UserData.get({
+    //     userId: userIdToEdit
+    //   });
+    // };
+
+
 
     $scope.completed = function () {
       var formField;
@@ -337,52 +380,51 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
      * Favorite project function
      */
 
-    //getUserFavorites.getUserFavoriteStories(userFavoriteProjects, projectId);
-    //getUserFavorites.toggleFavProject();
-
-    var getUserFavoriteStories = function (userFavoriteProjects, projectId) {
-      userFavoriteProjects.forEach(function (userFavoriteProject) {
-        if (userFavoriteProject === projectId) {
-          $scope.isFavorite = true;
+    $scope.$watchCollection('user.favorites',
+      function (newVal, oldVal) {
+        // console.log('PROJECTS CTRL :::::$scope.user.favorites BEFORE $watch\n', $scope.user.favorites, '\n');
+        // console.log('PROJECTS CTRL watchUpdateFavorites newVal.length::::::\n', newVal.length, '\n\n');
+        // console.log('PROJECTS CTRL watchUpdateFavorites::::::oldVal.length\n', oldVal.length);
+        if ($scope.user.favorites && newVal.length !== oldVal.length) {
+          $scope.user.favorites = newVal;
+          // console.log('PROJECTS CTRL :::::$scope.user.favorites AFTER $watch\n', $scope.user.favorites, '\n');
         }
-      });
-    };
-
-    $scope.toggleFavProject = function () {
-      $scope.isFavorite = !$scope.isFavorite;
-      console.log('$scope.user.favorites:\n', $scope.user.favorites);
-      var updateFavoriteObj = { favorite: $scope.project.id, isFavorite: true };
-      if (!$scope.isFavorite) {
-        updateFavoriteObj.isFavorite = false;
-        removeItemFromArray($scope.project.id);
-          //.then(function(resolved, rejected) {
-          //  if(rejected) { console.log('error removing project: var `rejected`\n:', rejected); }
-          //  $scope.watchUpdate(userFavorites);
-          //})
-      } else {
-        addItemToArray($scope.project.id);
-          //.then(function(resolved, rejected) {
-          //  if(rejected) { console.log('error removing project: var `rejected`\n:', rejected); }
-          //  $scope.watchUpdate(userFavorites);
-          //})
       }
-      $http.put('/api/v1/users/' + $scope.user._id, updateFavoriteObj);
-        //.then(function(resolved, rejected) {
-        //  if(rejected) { console.log('error removing project: var `rejected`\n:', rejected); }
-        //  $scope.watchUpdate(userFavorites);
-        //})
+    );
+
+
+    //var removeItemFromArray = function(item) {
+    //  var updatedFavProjects = $scope.user.favorites.indexOf(item);
+    //  if (updatedFavProjects !== -1) {
+    //    $scope.user.favorites.splice(updatedFavProjects, 1);
+    //  }
+    //};
+    //
+    //var addItemToArray = function(addedItem) {
+    //  $scope.user.favorites.push(addedItem);
+    //};
+
+    //var getUserFavoriteStories = function (userFavoriteProjects, projectId) {
+    //  userFavoriteProjects.forEach(function (userFavoriteProject) {
+    //    if (userFavoriteProject === projectId) {
+    //      $scope.isFavorite = true;
+    //    }
+    //  });
+    //};
+
+    var getUserFavoriteStoriesFn = function (userFavoriteProjects, projectId) {
+      userFavoritesService.getUserFavoriteStories(userFavoriteProjects, projectId,
+        function (err, data) {
+          $scope.isFavorite = data;
+        }
+      );
     };
 
-
-    var removeItemFromArray = function(item) {
-      var updatedFavProjects = $scope.user.favorites.indexOf(item);
-      if (updatedFavProjects !== -1) {
-        $scope.user.favorites.splice(updatedFavProjects, 1);
-      }
-    };
-
-    var addItemToArray = function(addedItem) {
-      $scope.user.favorites.push(addedItem);
+    $scope.toggleFavProjectFn = function () {
+      userFavoritesService.toggleFavProject($scope.isFavorite, $scope.project,
+        function (err, data) {
+          $scope.isFavorite = data;
+        });
     };
 
 
@@ -473,6 +515,131 @@ angular.module('projects').controller('ProjectsController', ['$scope', '$statePa
       });
     };
 
+
+    $scope.sorts = [
+      { category: 'sortOrder', name: 'Date Submitted', value: 'createdOn' },
+      { category: 'sortOrder', name: 'Title', value: 'title' },
+      { category: 'sortOrder', name: 'Author Name', value: 'user.lastName' },
+      { category: 'sortOrder', name: 'Submission Status', value: 'status' }
+    ];
+
+    $scope.categorySorts = [
+      { category: 'sortOrder', name: 'Essay', value: 'essay' },
+      { category: 'sortOrder', name: 'Multimedia', value: 'multimedia' },
+      { category: 'sortOrder', name: 'Video', value: 'video' },
+      { category: 'sortOrder', name: 'Audio', value: 'audio' },
+      { category: 'sortOrder', name: 'Photography', value: 'photography' },
+      { category: 'sortOrder', name: 'This Was Here', value: 'this was here' }
+    ];
+    
+    $scope.predicate = 'title';
+    $scope.reverse = true;
+    $scope.order = function(predicate) {
+      $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+      $scope.predicate = predicate;
+      console.log('predicate:\n', predicate);
+    };
+
+
+    //todo refactor into service
+
+    // Project Uploader Service logic
+    
+    $scope.projectFiles = [];
+    $scope.uploading = false;
+    var upload = null;
+
+
+    var projectUpload = function (project, files) {
+      //todo (1) change server function to default images to generic file names -- for projects: something like `uploaded-main-project-image.jpg`
+      //todo (2) set public read permissions on images
+      ///todo (3) file optimization
+
+      console.log('\nproject.files:\n', project.files, '\n');
+      console.log('\nfiles:\n', files, '\n');
+      console.log('\n$scope.projectFiles:\n', $scope.projectFiles, '\n');
+
+      // if (files.length > 0) {
+
+        for (var i = 0; files.length > i; i++) {
+          console.log('\n[i]: ', [i], '\n');
+          console.log('\nfiles.length: ', files.length, '\n');
+          console.log('\nfiles[' + [i] + ']: ', files[i], '\n');
+          console.log('\nfiles[' + [i] + '].name: ', files[i].name, '\n');
+          $scope.uploading = true;
+          var filename = files[i].name;
+          var type = files[i].type;
+          var query = {
+            project: project,
+            user: $scope.user,
+            filename: filename,
+            type: type,
+            file: files[i],
+            securityLevel: 'public-read'
+          };
+
+          console.log('route: api/v1/projects/' + query.project._id + '/s3/upload');
+          console.log('query:\n', query);
+
+          $http.post('api/v1/projects/' + query.project._id + '/s3/upload', query)
+            .then(function (resolved) {
+              console.log('\nresolved v1,\n', resolved, '\n\n');
+
+              /**
+              Upload.upload({
+                  url: resolved.data.url, //s3Url
+
+                  // transformRequest: function (data, headersGetter) {
+                  //   var headers = headersGetter();
+                  //   delete headers.Authorization;
+                  //   console.log('data v1\n', data);
+                  //   return data;
+                  // },
+
+                  fields: resolved.data.fields, //credentials
+                  method: 'POST',
+                  file: files[i]
+                })
+                .progress(function (evt) {
+                  console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total));
+                })
+                // file is uploaded successfully
+                //.then(function (data, status, headers, config) {
+                .then(function successCallback(response) {
+                  console.log('successCallback response:\n', response, '\n\n');
+                  // console.log('status:\n', status, '\n\n');
+                  //
+                  // var s3Result = xmlToJSON.parseString(data);   // parse
+                  // $scope.uploading = false;
+                  //
+                  // console.log('https://s3.amazonaws.com' + s3Result.PostResponse[0].Bucket[0]._text + '/' + s3Result.PostResponse[0].Key[0]._text);
+                  // console.log('The file ' + config.file.name + ' is uploaded successfully.\n');
+                  // console.log('Response:\n', s3Result);
+                }, function errorCallback(response) {
+                  console.log('errorCallback response:\n', response, '\n\n');
+                  // called asynchronously if an error occurs
+                  // or server returns response with an error status.
+                });
+              **/
+
+
+              // })
+            // .error(function (data, status, headers, config) {
+            //       console.log('data\n: ', data, '\n\n');
+            //       console.log('status\n: ', status, '\n\n');
+            //       console.log('headers\n: ', headers, '\n\n');
+            //       console.log('config\n: ', config, '\n\n');
+            //   // called asynchronously if an error occurs
+            //   // or server returns response with an error status.
+            //   $scope.uploading = false;
+            });
+
+        }
+        // console.log('here here oh my dear!');
+      // }
+    };
+    
+    
 
   }
 

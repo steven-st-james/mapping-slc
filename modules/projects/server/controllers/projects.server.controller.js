@@ -1,20 +1,35 @@
 'use strict';
 
-/**
- * Module dependencies.
- */
+
 var mongoose = require('mongoose'),
+  fs = require('fs'),
   path = require('path'),
+  _ = require('lodash'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   Project = mongoose.model('Project'),
-  _ = require('lodash'),
+
   config = require(path.resolve('./config/config')),
   AlchemyAPI = require('alchemy-api'),
   projects = require('./projects.server.controller'),
-  sanitizeHtml = require('sanitize-html');
-//Promise = require('bluebird'),
-//fs = Promise.promisifyAll(require('fs')),
-//exports = Promise.promisifyAll(exports);
+  sanitizeHtml = require('sanitize-html'),
+  //Promise = require('bluebird'),
+  //fs = Promise.promisifyAll(require('fs')),
+  //exports = Promise.promisifyAll(exports);
+  AWS = require('aws-sdk'),
+  s3Config = {
+    keys: require('../../../../config/env/production.js'),
+    bucket: 'mapping-slc-file-upload',
+    region: 'us-west-1',
+    directory: {
+      project: 'project-directory',
+      user: 'user-directory',
+      admin: 'admin-directory'
+    }
+  },
+  crypto = require('crypto'),
+  moment = require('moment'),
+  tinify = require('tinify'),
+  s3Url = 'https://' + s3Config.bucket + '.s3-' + s3Config.region + '.amazonaws.com';
 
 
 /**
@@ -447,4 +462,150 @@ let updateOldFeaturedProject = () => {
 exports.updateFeaturedProjects = function (req, res) {
   updateOldFeaturedProject();
   updateNewFeaturedProject(req.body);
+};
+
+
+exports.uploadProjectFiles = function (req, res) {
+
+  var project = req.body.project;
+  var file = req.body.file;
+  var fileName = req.body.filename;
+  
+  if (!/\s/g.test(fileName)) {
+    fileName = req.body.filename.replace(/\s/g, '_');
+    console.log('substitute all whitespace with underscores, var `fileName` : ', fileName);
+  }
+
+  var path = s3Config.directory.project + '/' + project._id + '/' + fileName;
+  var readType = req.body.securityLevel || 'private';
+
+  // console.log('\n\n`uploadProjectFiles()` var `req`:\n', req, '\n\n');
+  console.log('\n\n`uploadProjectFiles()` var `req.headers`:\n', req.headers, '\n\n');
+  // console.log('\n\n`uploadProjectFiles()` var `path`:\n', path, '\n\n');
+
+  console.log('\n\n`uploadProjectFiles()` var `req.body.file.size`:\n', req.body.file.size, '\n\n');
+  console.log('\n\n`uploadProjectFiles()` var `req.body.file.name`:\n', req.body.file.name, '\n\n');
+  // console.log('\n\n`uploadProjectFiles()` var `req.body.file`:\n', req.body.file, '\n\n');
+
+  // var readType = 'public-read';
+  // var expiration = moment().add(5, 'm').toDate(); //15 minutes
+  // var s3Policy = {
+  //   'expiration': expiration,
+  //   'conditions': [{
+  //     'bucket': s3Config.bucket
+  //   },
+  //     ['starts-with', '$key', path],
+  //     {
+  //       'acl': readType
+  //     },
+  //     {
+  //       'success_action_status': '201'
+  //     },
+  //     ['starts-with', '$Content-Type', req.body.type],
+  //     ['content-length-range', 2048, 10485760], //min and max
+  //   ]
+  // };
+  //
+  // var stringPolicy = JSON.stringify(s3Policy);
+  // var base64Policy = new Buffer(stringPolicy, 'utf-8').toString('base64');
+
+  // // sign policy
+  // var signature = crypto.createHmac('sha1', config.S3_SECRET)
+  //   .update(new Buffer(base64Policy, 'utf-8')).digest('base64');
+
+  // //now compress if image
+  // let optimizedImage = compressImage(image);
+
+
+  /** now upload files to S3 */
+
+  // policy: base64Policy,
+  // signature: signature,
+
+  //GrantReadACP:
+  //Metadata — (map<String>) A map of metadata to store with the object in S3
+
+
+  let awsS3Config = {
+
+  };
+
+  // let fileImage = fs.createReadStream(fileName).pipe(zlib.Gzip());
+  // let fileImage = fs.createReadStream();
+  let s3obj = {
+    Url: s3Url,
+    params: {
+      accessKeyId: config.S3_ID,
+      secretAccessKey: config.S3_SECRET,
+      region: 'us-west-1',
+      Key: path,
+      Bucket: s3Config.bucket
+    },
+    AWSAccessKeyId: config.S3_ID,
+    ACL: readType,
+
+    Body: file,
+    ContentLength: req.body.file.size
+    // ContentType: req.body.type
+    // ServerSideEncryption: 'AES256',
+    // success_action_status: 201
+  };
+
+  // console.log('\n\n`uploadProjectFiles()` var `awsS3Config`:\n', awsS3Config, '\n\n');
+  // console.log('\n\n`uploadProjectFiles()` var `fileImage`:\n', fileImage, '\n\n');
+  // console.log('\n\n`uploadProjectFiles()` var `s3obj`:\n', s3obj, '\n\n');
+
+
+    // s3.upload(s3obj).
+    //   on('httpUploadProgress', function(evt) {
+    //     console.log('httpUploadProgress - evt:\n', evt);
+    // }).
+    //   send(function(err, s3FileData) {
+    //     if(err) {
+    //       console.log('err:\n', err);
+    //     }
+    //     console.log('s3FileData:\n', s3FileData);
+    // });
+
+
+
+  // var s3obj = new AWS.S3(s3obj.params);
+  let s3 = new AWS.S3(awsS3Config.params);
+  s3.upload({ Body: s3obj.Body })
+    .on('httpUploadProgress', function(evt) { console.log(evt); })
+    .send(function(err, data) { console.log(err, data) });
+
+
+  ////now save url to mongoDb
+
+  //user.profileImageURL = 'https://s3-' + s3Config.region + '.amazonaws.com/' + s3Config.bucket + '/' + s3Config.directory.user + '/' + user._id + '/' + fileName;
+  //
+  //var updateUser = {
+  //  user: user
+  //};
+
+  //Users.update(updateUser);
+
+
+//now respond with a success message
+  res.jsonp({ 'message': 'success' });
+
+};
+
+
+let compressImage = (image) => {
+  tinify.key = config.tinyPngKey;
+  var fs = require("fs");
+  // fs.readFile('unoptimized.jpg', function(err, sourceData) {
+  fs.readFile(image, function(err, sourceData) {
+    if (err) {
+      throw err;
+    }
+    tinify.fromBuffer(sourceData).toBuffer(function(err, optimizedImg) {
+      if (err) {
+        throw err;
+      }
+      return optimizedImg
+    });
+  });
 };

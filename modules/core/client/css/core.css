@@ -186,14 +186,6 @@ div.main-overlay.core > div > div.row:first-child {
     margin: 0 2.5%;
 }
 
-.core featured-projects ul {
-    padding: 0;
-}
-
-.core featured-projects .row {
-    margin-left: 10px;
-}
-
 .core ul {
     list-style-type: none;
 }
@@ -681,9 +673,14 @@ button > .grow {
     display: inline-block;
 }
 
+.core sign-in-directive {
+    left: 20%;
+    top: 1rem;
+    position: relative;
+}
+
 .core sign-in-directive ul {
     position: relative;
-    top: -4rem;
 }
 
 .videoWrapper {

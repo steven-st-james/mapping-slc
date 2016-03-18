@@ -4,14 +4,15 @@
  * Module dependencies.
  */
 var _ = require('lodash'),
+  fs = require('fs'),
   defaultAssets = require('./config/assets/default'),
   testAssets = require('./config/assets/test'),
   glob = require('glob'),
   gulp = require('gulp'),
-  gulpIf = require('gulp-if'),
   eslint = require('gulp-eslint'),
   gulpLoadPlugins = require('gulp-load-plugins'),
   runSequence = require('run-sequence'),
+  gutil = require('gulp-util'),
   plugins = gulpLoadPlugins({
     rename: {
       'gulp-angular-templatecache': 'templateCache'
@@ -170,30 +171,8 @@ gulp.task('eslint', function () {
 
   return gulp.src(assets)
     .pipe(plugins.eslint())
-    .pipe(plugins.eslint.format())
-    .pipe(eslint({
-      fix: true
-    }))
-    .pipe(eslint.format())
-    // if fixed, write the file to dest
-    .pipe(gulpIf(isFixed, gulp.dest('../test/fixtures')));
+    .pipe(plugins.eslint.format());
 });
-
-
-//// ESLint JS linting & fix task
-//gulp.task('eslint-fix', function () {
-//  var assets = _.union(
-//    defaultAssets.server.gulpConfig,
-//    defaultAssets.server.allJS,
-//    defaultAssets.client.js
-//  );
-//
-//
-//  return gulp.src(assets)
-//    .pipe(plugins.eslint())
-//    .pipe(plugins.eslint.format());
-//});
-
 
 // JS minifying task
 gulp.task('uglify', function () {
@@ -207,6 +186,7 @@ gulp.task('uglify', function () {
     .pipe(plugins.uglify({
       mangle: false
     }))
+    .on('error', gutil.log)
     .pipe(plugins.concat('application.min.js'))
     .pipe(gulp.dest('public/dist'));
 });
@@ -252,20 +232,51 @@ gulp.task('imagemin', function () {
     .pipe(gulp.dest('public/dist/img'));
 });
 
+// Nodemon debug task
+gulp.task('nodemon-debug', function () {
+  return plugins.nodemon({
+    exec: 'node_modules/node-inspector/bin/inspector.js --save-live-edit --preload=false --web-port 1337 & node --debug',
+    script: 'server.js',
+    nodeArgs: ['--debug'],
+    ext: 'js,html',
+    verbose: true,
+    watch: _.union(defaultAssets.server.views, defaultAssets.server.allJS, defaultAssets.server.config)
+  });
+});
+
+// Copy local development environment config example
+gulp.task('copyLocalEnvConfig', function () {
+  var src = [];
+  var renameTo = 'local-development.js';
+
+  // only add the copy source if our destination file doesn't already exist
+  if (!fs.existsSync('config/env/' + renameTo)) {
+    src.push('config/env/local.example.js');
+  }
+
+  return gulp.src(src)
+    .pipe(plugins.rename(renameTo))
+    .pipe(gulp.dest('config/env'));
+});
+
+// Make sure upload directory exists
+gulp.task('makeUploadsDir', function () {
+  return fs.mkdir('modules/users/client/img/profile/uploads', function (err) {
+    if (err && err.code !== 'EEXIST') {
+      console.log(err);
+    }
+  });
+});
+
 // Angular template cache task
 gulp.task('templatecache', function () {
-  var re = new RegExp('\\' + path.sep + 'client\\' + path.sep, 'g');
-
   return gulp.src(defaultAssets.client.views)
     .pipe(plugins.templateCache('templates.js', {
       root: 'modules/',
       module: 'core',
-      templateHeader: '(function () {' + endOfLine + '  \'use strict\';' + endOfLine + endOfLine + '  angular' + endOfLine + '    .module(\'<%= module %>\'<%= standalone %>)' + endOfLine + '    .run(templates);' + endOfLine + endOfLine + ' templates.$inject = [\'$templateCache\'];' + endOfLine + endOfLine + '  function templates($templateCache) {' + endOfLine,
-      templateBody: '   $templateCache.put(\'<%= url %>\', \'<%= contents %>\');',
-      templateFooter: ' }' + endOfLine + '})();' + endOfLine,
-      transformUrl: function (url) {
-        return url.replace(re, path.sep);
-      }
+      templateHeader: '(function () {' + endOfLine + '	\'use strict\';' + endOfLine + endOfLine + '	angular' + endOfLine + '		.module(\'<%= module %>\'<%= standalone %>)' + endOfLine + '		.run(templates);' + endOfLine + endOfLine + '	templates.$inject = [\'$templateCache\'];' + endOfLine + endOfLine + '	function templates($templateCache) {' + endOfLine,
+      templateBody: '		$templateCache.put(\'<%= url %>\', \'<%= contents %>\');',
+      templateFooter: '	}' + endOfLine + '})();' + endOfLine
     }))
     .pipe(gulp.dest('build'));
 });
@@ -351,36 +362,28 @@ gulp.task('protractor', ['webdriver_update'], function () {
 });
 
 
-
-
 // Run the project in development mode
 gulp.task('default', function (done) {
-  runSequence('env:dev', ['nodemon', 'watch'], done);
+  runSequence('env:dev', ['copyLocalEnvConfig', 'makeUploadsDir'], ['nodemon', 'watch'], done);
 });
-
 
 // Lint CSS and JavaScript files.
 gulp.task('lint', function (done) {
   runSequence('less', 'sass', ['csslint', 'eslint', 'jshint'], done);
 });
 
-// EsLint - Lint & Fix JavaScript files.
-gulp.task('eslint-fix', function (done) {
-  runSequence('less', 'sass', ['eslint'], done);
-});
-
 // Lint project files and minify them into two production files.
 gulp.task('build', function (done) {
-  runSequence('env:dev', 'lint', ['uglify', 'cssmin'], done);
+  runSequence('env:dev', ['uglify', 'cssmin'], done);
 });
 
 // Run the project tests
 gulp.task('test', function (done) {
-  runSequence('env:test', 'lint', 'mocha', 'karma', 'nodemon', 'protractor', done);
+  runSequence('env:test', 'test:server', 'karma', 'nodemon', 'protractor', done);
 });
 
 gulp.task('test:server', function (done) {
-  runSequence('env:test', 'lint', 'mocha', done);
+  runSequence('env:test', ['copyLocalEnvConfig', 'makeUploadsDir'], 'lint', 'mocha', done);
 });
 
 // Watch all server files for changes & run server tests (test:server) task on changes
@@ -413,7 +416,7 @@ gulp.task('build', function (done) {
 // optional arguments: 
 // Run the project in debug mode
 gulp.task('debug', function (done) {
-  runSequence('env:dev', ['nodemon', 'watch'], done);
+  runSequence('env:dev', ['nodemon-debug', 'watch'], done);
 });
 
 // Lint project files and minify them into two production files.
@@ -428,13 +431,18 @@ gulp.task('prod-no-mini', function (done) {
 
 // Run the project in production mode
 gulp.task('prod', function (done) {
-  runSequence('templatecache', 'build-no-lint', 'env:prod', ['nodemon', 'watch'], done);
+  runSequence(['copyLocalEnvConfig', 'makeUploadsDir', 'templatecache'], 'build', 'env:prod', ['nodemon', 'watch'], done);
+});
+
+// Run the project in production mode
+gulp.task('heroku', function (done) {
+  runSequence(['copyLocalEnvConfig', 'makeUploadsDir', 'templatecache'], 'build', 'env:prod', ['nodemon', 'watch'], done);
 });
 
 
 // Run the project in production mode
-gulp.task('heroku', function (done) {
-  runSequence('env:dev', 'templatecache', ['uglify', 'cssmin'], done);
+gulp.task('modulus', function (done) {
+  runSequence('env:prod', 'templatecache', ['uglify', 'cssmin'], ['nodemon', 'watch'], done);
 });
 
 

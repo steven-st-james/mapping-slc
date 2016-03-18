@@ -1,8 +1,6 @@
-/config/assets/development.js
-/modules/projects/client/img/Cafe-on-1st-Avenues-Coffee-Shop-28.jpg
 # General
 *.csv
-
+/.local-configs
 
 # Node and related ecosystem
 # ==========================
@@ -18,32 +16,21 @@ coverage/
 
 # MEAN.js app and assets
 # ======================
-
-modules/users/client/img/profile/uploads
-config/env/local.js
 config/env/local-*.js
 *.pem
+/ng-file-upload wiki.md
+/config/assets/development.js
 /modules/core/server/controllers/envVars.server.controller.js
 
 # Ignoring MEAN.JS's gh-pages branch for documenation
 _site/
 
-/modules/core/server/config
 /config/env/localEnvVars.js
 
-
-# MEAN.js app and assets
-# ======================
-#public/dist/
-#/build
 /uploads
 /modules/projects/server/uploads
 /modules/projects/server/models/data/private
 /modules/users/server/config/.private
-
-
-
-
 /modules/chat
 /modules/.articles
 /modules/core/client/img/loaders/circle-close.png
@@ -52,10 +39,5 @@ _site/
 /modules/core/client/img/loaders/circle-close-final.jpg
 /.aws
 
-
-# MEAN.js app and assets
-# ======================
-#public/dist/
-#build/
-
 access.log
+/README_internal.md

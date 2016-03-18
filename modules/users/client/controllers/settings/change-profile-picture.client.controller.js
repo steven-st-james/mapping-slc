@@ -4,7 +4,13 @@ angular.module('users').controller('ChangeProfilePictureController', ['$scope', 
   function ($scope, $timeout, $window, Authentication, Upload, $http, ProfileImageService) {
 
     $scope.init = function () {
-      ProfileImageService.getUploadedProfilePic(Authentication);
+      console.log('init me baby!');
+      ProfileImageService.getUploadedProfilePic(Authentication,
+        function(image, err) {
+          console.log('image\n', image);
+          console.log('err\n', err);
+          $scope.user.profileImageURL = image;
+        });
     };
 
     //// Create a new cache with a capacity of 10
@@ -15,8 +21,11 @@ angular.module('users').controller('ChangeProfilePictureController', ['$scope', 
     $scope.imageURL = $scope.user.profileImageURL;
     var upload = null;
 
-
+    
     $scope.onFileSelect = function (files) {
+      //todo (1) change server function to default images to generic file names -- for user: `uploaded-profile-image.jpg` ... for projects: something like `uploaded-main-project-image.jpg`
+      //todo (2) set public read permissions on images
+      ///todo (3) file optimization
 
       if (files.length > 0) {
         $scope.uploading = true;
@@ -27,8 +36,8 @@ angular.module('users').controller('ChangeProfilePictureController', ['$scope', 
           filename: filename,
           type: type
         };
-        var configObj = { cache: true };
-        $http.post('api/v1/s3/upload', query, configObj)
+        console.log('query:::\n', query);
+        $http.post('api/v1/user/'+ query.user._id +'/s3/upload', query)
           .success(function (result) {
             console.log('result v1\n', result);
             Upload.upload({
@@ -48,18 +57,16 @@ angular.module('users').controller('ChangeProfilePictureController', ['$scope', 
               var s3Result = xmlToJSON.parseString(data);   // parse
               // file is uploaded successfully
               $scope.uploading = false;
+              console.log('s3Result:::\n', s3Result);
               console.log('status: ', status);
               console.log('The file ' + config.file.name + ' is uploaded successfully.\nResponse:\n', s3Result);
-              $scope.imageURL = 'https://s3-us-west-1.amazonaws.com/mapping-slc-file-upload/' + s3Result.PostResponse[0].Key[0]._text;
-              console.log('$scope.imageURL 111:\n', $scope.imageURL);
+
+
+              $scope.user.profileImageURL = 'https://s3.amazonaws.com' + s3Result.PostResponse[0].Bucket[0]._text +'/' + s3Result.PostResponse[0].Key[0]._text;
+
+              console.log('https://s3.amazonaws.com' + s3Result.PostResponse[0].Bucket[0]._text +'/' + s3Result.PostResponse[0].Key[0]._text);
+              console.log('$scope.user.profileImageURL final:\n', user.profileImageURL);
             });
-
-
-            if (result && result.s3Url) {
-              console.log('result v3452\n', result);
-              $scope.user.profileImageURL = result.s3Url;
-              $scope.imageURL = result.s3Url;
-            }
           })
           .error(function (data, status, headers, config) {
             // called asynchronously if an error occurs
@@ -70,9 +77,7 @@ angular.module('users').controller('ChangeProfilePictureController', ['$scope', 
       }
     };
 
-    //var profileImgage = 'img src="data:image/jpeg;base64,';
-
-    $scope.image;
+    // $scope.image;
     /**
      * hits back end route that calls `getS3File()`
      *
@@ -137,7 +142,7 @@ angular.module('users').controller('ChangeProfilePictureController', ['$scope', 
       console.log('fileType:\n', fileType);
       console.log('query:\n', query);
 
-      $http.post('api/v1/s3/upload/media/photo', query)
+      $http.post('api/v1/users/'+ query.user._id +'/s3/upload', query)
         .then(function (result) {
 
           console.log('result:\n', result);
