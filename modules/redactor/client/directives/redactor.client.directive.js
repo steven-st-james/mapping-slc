@@ -13,6 +13,10 @@
     .constant('redactorOptions', redactorOptions)
     .directive('redactor', ['$timeout', function ($timeout) {
 
+      var project = {
+        _id: '56f4e0deb11c53c0117d967c'
+      };
+
       return {
         restrict: 'A',
         require: 'ngModel',
@@ -42,7 +46,9 @@
 
 
           angular.extend(options, redactorOptions, additionalOptions);
-          console.log(':::options::::\n', options);
+          console.log(':::options 1::::\n', options);
+          options.imageUpload = '/api/v1/projects/' + project._id + '/s3/upload';
+          console.log(':::options 2::::\n', options);
           // put in timeout to avoid $digest collision.  call render()
           // to set the initial value.
           $timeout(function () {
