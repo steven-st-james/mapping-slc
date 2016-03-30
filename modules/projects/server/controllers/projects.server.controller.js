@@ -505,8 +505,8 @@ exports.uploadProjectFiles = (req, res) => {
 
   // for(var i = 0; )
 
-  // console.log('req:\n', req, '\n\n\n\n\n');
-  // console.log('\n\n\n\n\n:::::::::::::::::::::::::::::::::::::::::::::::::::\n\n\n\n\n');
+   console.log('req:\n', req, '\n\n\n\n\n');
+   console.log('\n\n\n\n\n:::::::::::::::::::::::::::::::::::::::::::::::::::\n\n\n\n\n');
   // console.log('req.headers:\n', req.headers, '\n\n');
   // console.log('req.project:\n', req.project, '\n\n');
   // console.log('req.user:\n', req.user, '\n\n');

@@ -3,10 +3,12 @@
 (function () {
   
   var redactorOptions = {
-    plugins: ['source', 'alignment', 'filemanager', 'imagemanager', 'video'],
+    plugins: ['source', 'alignment', 'filemanager', 'imagemanager', 'video','Upload'],
     focus: true
   };
-
+  var project = {
+    _id:'TEST'
+  };
   angular.module('angular-redactor')
     .constant('redactorOptions', redactorOptions)
     .directive('redactor', ['$timeout', function ($timeout) {
@@ -15,7 +17,9 @@
         restrict: 'A',
         require: 'ngModel',
         link: function (scope, element, attrs, ngModel) {
-
+        angular.element('#redactor').redactor({
+          imageUpload:'/api/v1/projects/' + project._id + '/s3/upload'
+        });
           // Expose scope var with loaded state of Redactor
           scope.redactorLoaded = false;
 
