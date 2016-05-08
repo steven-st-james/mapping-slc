@@ -10,17 +10,31 @@ module.exports = {
         '//api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css',
         'public/lib/angular-material/angular-material.css',
         'public/lib/angular-material/angular-material.layouts.min.css',
-        'modules/redactor/redactor/redactor.css',
-        'public/lib/sidebar-v2/css/leaflet-sidebar.css',
         'public/lib/font-awesome/css/font-awesome.css',
         'public/lib/angular-notify/dist/angular-notify.css',
-        'public/lib/ng-ckeditor/ng-ckeditor.css',
         'public/lib/angular-bootstrap-lightbox/dist/angular-bootstrap-lightbox.css',
-        'public/lib/c3/c3.css'
+        'public/lib/mslc/angular-froala/src/css/froala_editor.min.css',
+        'public/lib/mslc/angular-froala/src/css/froala_style.min.css',
+
+        //load css for plugins for Froala text editor
+        'public/lib/mslc/angular-froala/src/css/plugins/code_view.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/colors.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/draggable.min.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/emoticons.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/file.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/fullscreen.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/image_manager.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/image.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/line_breaker.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/table.css',
+        'public/lib/mslc/angular-froala/src/css/plugins/video.css'
+
+
       ],
       js: [
         'public/lib/jquery/dist/jquery.js',
         'public/lib/jquery-migrate/jquery-migrate.min.js',
+        'public/lib/modernizr/modernizr.js',
         'public/lib/angular/angular.js',
         'public/lib/angular-resource/angular-resource.js',
         'public/lib/angular-animate/angular-animate.js',
@@ -36,25 +50,41 @@ module.exports = {
         'public/lib/angular-ui-utils/ui-utils.js',
         'public/lib/angular-bootstrap/ui-bootstrap.js',
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
-        'public/lib/modernizr/modernizr.js',
+        'public/lib/angular-notify/dist/angular-notify.js',
         '//api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
         'public/lib/rangy/rangy-core.js',
-        'public/lib/d3/d3.js',
-        'public/lib/ng-ckeditor/libs/ckeditor/ckeditor.js',
-        'public/lib/ng-ckeditor/ng-ckeditor.js',
-        'public/lib/sidebar-v2/js/leaflet-sidebar.js',
+        'public/lib/mslc/angular-froala/src/js/froala_editor.min.js',
         'public/lib/classie/classie.js',
-        'public/lib/masonry/dist/masonry.pkgd.js',
         'public/lib/moment/min/moment.js',
-        'public/lib/c3/c3.js',
         'public/lib/xmlToJSON.js/lib/xmlToJSON.js',
-        'public/lib/angular-notify/dist/angular-notify.js',
         'public/lib/ng-file-upload/ng-file-upload-shim.js',
         'public/lib/ng-file-upload/ng-file-upload.js',
-        'public/lib/mslc/redactor/redactor.js'
-        // 'modules/redactor/client/redactor.js'
-        // 'modules/redactor/client/angular-redactor-2.js'
+
+        //load plugins for Froala text editor
+        'public/lib/mslc/angular-froala/src/js/plugins/align.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/char_counter.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/code_beautifier.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/code_view.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/colors.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/emoticons.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/entities.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/file.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/font_family.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/font_size.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/fullscreen.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/image.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/image_manager.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/inline_style.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/line_breaker.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/link.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/lists.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/paragraph_format.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/paragraph_style.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/quote.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/save.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/table.min.js',
+        'public/lib/mslc/angular-froala/src/js/plugins/video.min.js'
 
       ],
       tests: [
@@ -85,7 +115,7 @@ module.exports = {
     ],
     views: [
       'modules/*/client/views/**/*.html',
-      'modules/**/*/directives/views/**/*.html'
+      'modules/*/client/directives/views/**/*.html'
     ],
     templates: ['build/templates.js']
   },
